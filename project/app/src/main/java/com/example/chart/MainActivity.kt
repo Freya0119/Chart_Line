@@ -1,6 +1,7 @@
 package com.example.chart
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,9 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,7 +29,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.example.chart.chart.CustomMarker
 import com.example.chart.chart.CustomLineChart
 import com.example.chart.ui.theme.ChartTheme
+import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 
 const val DATA_MSG = "DATA_MSG"
 
@@ -60,8 +67,9 @@ fun MainApp(vm: DataViewModel) {
 
 @Composable
 fun TestValueChange(lineData: LineData) {
-    val setsCount = lineData.maxEntryCountSet.entryCount.toFloat()
-    var minRange by rememberSaveable { mutableFloatStateOf(setsCount - 12f) }
+    var year by rememberSaveable { mutableFloatStateOf(12f) }
+
+    Log.d(DATA_MSG, "min: ${lineData.xMin}, max: ${lineData.xMax}")
 
     Column(
         modifier = Modifier
@@ -69,13 +77,13 @@ fun TestValueChange(lineData: LineData) {
             .padding(8.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = { minRange = setsCount - 12f }) {
+            Button(onClick = { year = 12f }, modifier = Modifier.weight(1f)) {
                 Text(text = "一年")
             }
-            Button(onClick = { minRange = setsCount - 36f }) {
+            Button(onClick = { year = 36f }, modifier = Modifier.weight(1f)) {
                 Text(text = "三年")
             }
-            Button(onClick = { minRange = setsCount - 60f }) {
+            Button(onClick = { year = 60f }, modifier = Modifier.weight(1f)) {
                 Text(text = "五年")
             }
         }
@@ -91,16 +99,13 @@ fun TestValueChange(lineData: LineData) {
                 markerView.setLegendPosition()
 
                 lineChart.setCustom()
-
-                lineChart.xAxis.let {
-                    it.setLabelCount(3)
-                }
+                lineChart.setXAXis()
 
                 lineChart
             },
             update = {
                 it.data = lineData
-                it.setRange(minRange)
+                it.setRange((it.xChartMax - year).toFloat())
                 it.invalidate()
             },
             modifier = Modifier

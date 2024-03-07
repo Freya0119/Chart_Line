@@ -3,6 +3,7 @@ package com.example.chart.chart
 import android.content.Context
 import android.widget.TextView
 import com.example.chart.R
+import com.example.chart.data.colors
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LegendEntry
 import com.github.mikephil.charting.components.MarkerView
@@ -58,8 +59,12 @@ class CustomMarker(context: Context, layoutResource: Int) : MarkerView(context, 
     }
 
     override fun refreshContent(e: Entry?, highlight: Highlight?) {
-        super.refreshContent(e, highlight)
-        textView?.text = "X: date, Y: ${e?.y}"
+        val value = e?.x ?: 0f
+
+        val year = FIRST_YEAR + (value / 12).toInt()
+        val month = FIRST_MONTH + (value % 12).toInt()
+
+        textView?.text = "${year}/${month}, 股價: ${e?.y}"
 
         if (legendList.size == lineCount) { // 最後一個是股價
             for (i in 0..<lineCount) {
@@ -69,6 +74,7 @@ class CustomMarker(context: Context, layoutResource: Int) : MarkerView(context, 
                 }
             }
         }
+        super.refreshContent(e, highlight)
     }
 
     private fun setLabel() {

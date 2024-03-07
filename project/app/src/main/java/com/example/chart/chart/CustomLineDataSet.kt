@@ -13,16 +13,6 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
 
-val colors = listOf(
-    Color.RED,
-    Color.parseColor("#FF8000"),
-    Color.parseColor("#FFFF00"),
-    Color.parseColor("#80FF00"),
-    Color.parseColor("#00FFFF"),
-    Color.parseColor("#0000FF"),
-    Color.parseColor("#FF00FF")
-)
-
 class CustomLineDataSet(entry: List<Entry>, label: String) : LineDataSet(entry, label) {
     fun setCircle() {
         this.setDrawCircles(false)

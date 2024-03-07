@@ -6,9 +6,6 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class RiverMapInfo(
-    @PrimaryKey
-    val stockCode: Int?,
-
     @ColumnInfo("平均本淨比")
     @SerializedName("平均本淨比")
     val pbrAverage: String?,
@@ -19,7 +16,7 @@ data class RiverMapInfo(
 
     @ColumnInfo("年月")
     @SerializedName("年月")
-    val yearMonth: Int?,
+    val yearMonth: String?,
 
     @ColumnInfo("月平均收盤價")
     @SerializedName("月平均收盤價")

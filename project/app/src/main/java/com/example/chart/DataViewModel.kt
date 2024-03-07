@@ -5,12 +5,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.chart.chart.CustomLineDataSet
-import com.example.chart.chart.colors
 import com.example.chart.data.Stock
 import com.example.chart.data.StockData
+import com.example.chart.data.colors
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.utils.Utils.init
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
