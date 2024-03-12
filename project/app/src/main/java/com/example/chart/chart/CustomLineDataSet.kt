@@ -21,7 +21,7 @@ class CustomLineDataSet(entry: List<Entry>, label: String) : LineDataSet(entry, 
     fun setLineColor(color: Int, isFill: Boolean) {
         this.color = color
         this.fillColor = color
-        this.fillAlpha = 255
+        this.fillAlpha = 153
 
         this.setDrawFilled(isFill)
     }

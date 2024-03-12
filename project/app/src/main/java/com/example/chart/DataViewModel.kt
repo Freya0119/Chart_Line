@@ -8,6 +8,7 @@ import com.example.chart.chart.CustomLineDataSet
 import com.example.chart.data.Stock
 import com.example.chart.data.StockData
 import com.example.chart.data.colors
+import com.example.chart.data.priceColor
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
@@ -57,18 +58,18 @@ class DataViewModel() : ViewModel() {
 
         // price data
         val priceData = CustomLineDataSet(entryList[6], "Price")
-        priceData.setLineColor(colors[6], false)
-        priceData.setCircle()   // false
+        priceData.setLineColor(priceColor, false)
+        priceData.setCircle()
 
         for (i in 0..<entryList.size - 1) {
             val data = CustomLineDataSet(entryList[i], "Label $i")
-            data.setCircle()    // false
+            data.setCircle()
             data.setLineColor(colors[i], true)
 
             sets.add(data)
         }
 
-        sets.add(priceData) // price最後
+        sets.add(priceData) // price 最後
         setLineData(sets)
     }
 
