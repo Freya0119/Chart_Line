@@ -1,9 +1,12 @@
 package com.example.chart
 
+import android.app.LocaleConfig
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
@@ -25,8 +29,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -34,37 +41,53 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.chart.chart.CustomMarker
 import com.example.chart.chart.CustomLineChart
+import com.example.chart.fragment.LineChartFragment
 import com.example.chart.ui.theme.ChartTheme
 import com.github.mikephil.charting.data.LineData
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 const val DATA_MSG = "DATA_MSG"
 
 const val STOCK_ID = 2330
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<DataViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.setLifecycle(this)
+        setContentView(R.layout.main_activity)
 
-        setContent {
-            ChartTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    MainApp(viewModel)
-                }
-            }
-        }
+//        viewModel.setLifecycle(this)
+
+//        setContent {
+//            ChartTheme {
+//                MainApp(viewModel, Modifier.fillMaxSize())
+//            }
+//        }
     }
 }
 
 @Composable
-fun MainApp(vm: DataViewModel) {
+fun MainApp(vm: DataViewModel, modifier: Modifier) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+
     val lineDataSets by vm.dataSets.observeAsState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .width(screenWidth / 3)
+        .height(screenHeight / 3)) {
+        RiverText(modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Red))
         ButtonAndChart(LineData(lineDataSets))
+        OtherView(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.LightGray)
+        )
     }
 }
 
@@ -113,9 +136,6 @@ fun ButtonAndChart(lineData: LineData) {
 @Composable
 fun ShowLineChart(lineData: LineData, range: Float) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp)
     ) {
         AndroidView(
             factory = { it ->
@@ -128,8 +148,8 @@ fun ShowLineChart(lineData: LineData, range: Float) {
                 lineChart.setCustom()
                 lineChart.setXAXis()
 
-                lineChart.setLegendPosition()
-                lineChart.setLegends()
+//                lineChart.setLegendPosition()
+//                lineChart.setLegends()
 
                 lineChart
             },
@@ -142,4 +162,14 @@ fun ShowLineChart(lineData: LineData, range: Float) {
                 .fillMaxSize(),
         )
     }
+}
+
+@Composable
+fun RiverText(modifier: Modifier) {
+    Text("River with text", modifier = modifier.wrapContentSize(Alignment.Center))
+}
+
+@Composable
+fun OtherView(modifier: Modifier) {
+    Text("Other", modifier = modifier.wrapContentSize(Alignment.Center))
 }

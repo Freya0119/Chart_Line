@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/view_padding">
+
+    <include
+        android:id="@+id/date"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="date"
+        app:layout_constraintEnd_toEndOf="@id/river1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/price"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/river2"
+        app:layout_constraintStart_toEndOf="@id/date"
+        app:layout_constraintTop_toTopOf="@id/date" />
+
+    <include
+        android:id="@+id/river1"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river1"
+        app:layout_constraintEnd_toStartOf="@id/river2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date" />
+
+    <include
+        android:id="@+id/river2"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river2"
+        app:layout_constraintEnd_toStartOf="@id/river3"
+        app:layout_constraintStart_toEndOf="@+id/river1"
+        app:layout_constraintTop_toTopOf="@id/river1" />
+
+    <include
+        android:id="@+id/river3"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/river2"
+        app:layout_constraintTop_toTopOf="@id/river1" />
+
+    <include
+        android:id="@+id/river4"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river4"
+        app:layout_constraintEnd_toStartOf="@id/river5"
+        app:layout_constraintStart_toStartOf="@id/river1"
+        app:layout_constraintTop_toBottomOf="@id/river1" />
+
+    <include
+        android:id="@+id/river5"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river5"
+        app:layout_constraintEnd_toStartOf="@id/river6"
+        app:layout_constraintStart_toEndOf="@+id/river4"
+        app:layout_constraintTop_toTopOf="@id/river4" />
+
+    <include
+        android:id="@+id/river6"
+        layout="@layout/tv_and_form"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="river6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/river5"
+        app:layout_constraintTop_toTopOf="@id/river4" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

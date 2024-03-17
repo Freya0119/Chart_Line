@@ -60,7 +60,7 @@ data class Stock(
     val pbrStandard: List<String?>?,
 
     @SerializedName("本益比基準")
-    val perStandard: List<String?>?,
+    val perStandard: List<Float?>?,
 
     @SerializedName("河流圖資料")
     val riverMapInfo: List<RiverMapInfo?> = listOf()
