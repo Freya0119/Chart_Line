@@ -16,7 +16,7 @@ class CustomLineDataSet(entry: List<Entry>, label: String) : LineDataSet(entry, 
         this.setDrawCircles(false)
     }
 
-    fun setLineColor(color: Int, alpha: Int, isFill: Boolean) {
+    fun setLineColor(color: Int, isFill: Boolean) {
         this.color = color
         this.fillColor = color
         this.fillAlpha = 255

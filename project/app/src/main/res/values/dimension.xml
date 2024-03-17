@@ -2,4 +2,7 @@
 <resources>
     <dimen name="page_padding">8dp</dimen>
     <dimen name="view_padding">4dp</dimen>
+    <dimen name="form_size">20dp</dimen>
+    <dimen name="text_size">10dp</dimen>
+    <dimen name="view_padding_half">2dp</dimen>
 </resources>

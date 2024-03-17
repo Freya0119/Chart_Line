@@ -2,18 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:padding="@dimen/view_padding">
 
     <TextView
         android:id="@+id/form"
-        android:layout_width="30dp"
-        android:layout_height="30dp" />
+        android:layout_width="@dimen/form_size"
+        android:layout_height="@dimen/form_size"
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/tv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="form and tv" />
+        android:layout_height="@dimen/form_size"
+        android:gravity="center_vertical"
+        android:padding="@dimen/view_padding_half"
+        android:text=""
+        android:textSize="@dimen/text_size" />
 
 </LinearLayout>

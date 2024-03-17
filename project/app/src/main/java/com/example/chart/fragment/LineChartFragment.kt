@@ -1,20 +1,28 @@
 package com.example.chart.fragment
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.core.os.ConfigurationCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.chart.DATA_MSG
 import com.example.chart.DataViewModel
-import com.example.chart.R
 import com.example.chart.chart.CustomFillFormatter
 import com.example.chart.chart.CustomFillLineRender
+import com.example.chart.chart.CustomLineDataSet
+import com.example.chart.chart.CustomXAxisFormatter
+import com.example.chart.data.btStrList
 import com.example.chart.data.colors
-import com.example.chart.data.dateColor
 import com.example.chart.data.priceColor
+import com.example.chart.data.startRangePointList
 import com.example.chart.databinding.ButtonBinding
 import com.example.chart.databinding.LineChartBinding
 import com.github.mikephil.charting.charts.LineChart
@@ -23,9 +31,8 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-
-// TODO: alpha
 
 class LineChartFragment() : Fragment() {
 
@@ -34,16 +41,14 @@ class LineChartFragment() : Fragment() {
 
     private val viewModels: DataViewModel by activityViewModels<DataViewModel>()
 
+    private val stock get() = viewModels.stock
+    private val priceEntry get() = viewModels.priceEntry
+    private val riverEntry get() = viewModels.riverEntry
+
     private lateinit var chart: LineChart
 
-    private val stock get() = viewModels.stock
-
-    private var entry = mutableListOf<List<Entry>>()
-
-    // TODO
+    // button
     private lateinit var btList: List<ButtonBinding>
-    private val btStrList = listOf("一年", "三年", "五年")
-    private val rangeList = listOf(60f, 36f, 12f)
 
     private var btFocus = 0
 
@@ -55,130 +60,71 @@ class LineChartFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        init()
-//
-
-        // TODO: for test
-        chart = binding.lc
+        init()
 
         viewModels.setLifecycle(viewLifecycleOwner)
 
-        viewModels.dataSets.observe(viewLifecycleOwner) {
+        viewModels.dataList.observe(viewLifecycleOwner) {
             Log.d(DATA_MSG, "DataSets observe")
-//            chart.data = LineData(it)
 
-            // TODO: doing
-            entry = viewModels.getEntry().toMutableList()
-            if (entry.size > 0) {
-                val lineData = LineData()
-                entry.forEach {
-                    // TODO: change to custom
-                    val lineDataSet = LineDataSet(it, "")
-                    lineData.addDataSet(lineDataSet)
-                }
-                chart.data = lineData
-            }
+            viewModels.updateEntry()
+            updateChartData()
+            updateXLabel()
+
+            val lastInd = stock.value?.riverMapInfo?.lastIndex ?: 0
+            updateText(lastInd)
+            // with invalidate
             chart.invalidate()
         }
-
-//        // TODO: test
-//        val aList = listOf(0f, 1f, 2f, 3f, 4f)
-//        val bList = listOf(1f, 2f, 3f, 5f, 7f)
-//        val entry = aList.zip(bList) { x, y -> Entry(x, y) }
-//        val linedataset = LineDataSet(entry, "test")
-//        linedataset.setDrawFilled(true)
-//
-//        val boundLine = entry.map { Entry(it.x, it.y - 1f) }
-//        val formatter = CustomFillFormatter(LineDataSet(boundLine, ""))
-//        linedataset.fillFormatter = formatter
-//
-//        val linedata = LineData(linedataset)
-//        val newchart = binding.lc
-//
-//        val render = CustomFillLineRender(newchart, newchart.animator, newchart.viewPortHandler)
-//        newchart.renderer = render
-//
-//        newchart.data = linedata
     }
 
-    private fun setLcRange(range: Float) {
-        chart.xAxis.axisMinimum = range
-        chart.notifyDataSetChanged()
-        chart.invalidate()
-    }
+    private fun updateChartData() {
+        if (riverEntry.size > 0) {
+            val lineDataSets = mutableListOf<ILineDataSet>()
 
-    private fun changeFocus(index: Int) {
-        btFocus = index
+            if (riverEntry.size == colors.size) {
+                val lastInd = riverEntry.lastIndex
+                // formatter
+                val boundEntry = riverEntry[lastInd].map { Entry(it.x, it.y - 50f) }
+                val formatter = CustomFillFormatter(LineDataSet(boundEntry, ""))
+
+                for (i in 0..lastInd) {
+                    val entry = riverEntry[i]
+                    val lineDataSet = CustomLineDataSet(entry, "")
+
+                    lineDataSet.setCircle()
+                    lineDataSet.setLineColor(colors[i], true)
+                    lineDataSet.fillFormatter = formatter
+
+                    lineDataSets.add(lineDataSet)
+                }
+            }
+
+            val priceLine = CustomLineDataSet(priceEntry, "")
+            priceLine.setCircle()
+            priceLine.setLineColor(priceColor, false)
+            lineDataSets.add(priceLine)
+
+            chart.data = LineData(lineDataSets)
+            // render
+            val render = CustomFillLineRender(chart, chart.animator, chart.viewPortHandler)
+            chart.renderer = render
+        }
     }
 
     private fun init() {
-        btList = listOf(
-            binding.buttonGroup.btOne,
-            binding.buttonGroup.btThree,
-            binding.buttonGroup.btFive
-        )
-
-        btList.mapIndexed { index, buttonBinding ->
-            buttonBinding.tv.text = btStrList[index]
-
-            buttonBinding.root.setOnClickListener {
-                changeFocus(index)
-                updateUnderLine()
-                setLcRange(rangeList[index])
-            }
-        }
-
-        initForm()
+        initPageView()
+        initBtForm()
         initChart()
+
+        binding.buttonGroup.btOne.root.performClick()
     }
 
-    private fun initForm() {
-        binding.tvGroup.date.form.setBackgroundColor(dateColor)
-        binding.tvGroup.price.form.setBackgroundColor(priceColor)
-
-        val formList = listOf(
-            binding.tvGroup.river1.form,
-            binding.tvGroup.river2.form,
-            binding.tvGroup.river3.form,
-            binding.tvGroup.river4.form,
-            binding.tvGroup.river5.form,
-            binding.tvGroup.river6.form
-        )
-        formList.mapIndexed { index, textView ->
-            textView.setBackgroundColor(colors[index])
-        }
-    }
-
-    private fun initChart() {
-        chart = binding.lc
+    private fun setChartClickListener() {
         chart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onValueSelected(e: Entry?, h: Highlight?) {
-                Log.d(DATA_MSG, "Selected: $e")
-
                 if (e != null) {
-                    val river = stock.value?.riverMapInfo?.get(e.x.toInt())
-
-                    val date = river?.yearMonth ?: ""
-                    binding.tvGroup.date.tv.text = date.toYearMonth()
-
-                    val price = river?.closingPriceMonth
-                    binding.tvGroup.price.tv.text = "股價: $price"
-
-                    val rStandardList = stock.value?.perStandard ?: emptyList()
-                    val rPriceList = river?.perStockPriceStandard ?: emptyList()
-                    val riverTvList = listOf(
-                        binding.tvGroup.river1.tv,
-                        binding.tvGroup.river2.tv,
-                        binding.tvGroup.river3.tv,
-                        binding.tvGroup.river4.tv,
-                        binding.tvGroup.river5.tv,
-                        binding.tvGroup.river6.tv,
-                    )
-                    if (rStandardList.size == riverTvList.size && rPriceList.size == riverTvList.size) {
-                        riverTvList.mapIndexed { index, tv ->
-                            tv.text = "${rStandardList[index]}倍: ${rPriceList[index]}"
-                        }
-                    }
+                    updateText(e.x.toInt())
                 }
             }
 
@@ -186,21 +132,36 @@ class LineChartFragment() : Fragment() {
                 Log.d(DATA_MSG, "Nothing selected")
             }
         })
+    }
 
-        chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        chart.xAxis.axisMinimum = rangeList[btFocus]
+    private fun updateText(x: Int) {
+        // 日期: 遠 -> 近
+        val sortRiver = stock.value?.riverMapInfo?.sortedBy { it?.yearMonth }
 
-        chart.legend.isEnabled = false
+        val riverInfo = sortRiver?.get(x)
 
-        // TODO: no
-        if (!viewModels.dataSets.value.isNullOrEmpty()) {
-            Log.d(DATA_MSG, "Set formatter")
-            val data = viewModels.dataSets.value?.get(viewModels.dataSets.value!!.lastIndex)
-            val formatter = CustomFillFormatter(data)
+        val date = riverInfo?.yearMonth ?: ""
+        binding.tvGroup.date.tv.text = "日期: ${date.toYearMonth()}"
 
-            Log.d(DATA_MSG, "Set render")
-            val render = CustomFillLineRender(chart, chart.animator, chart.viewPortHandler)
-            chart.renderer = render
+        val price = riverInfo?.closingPriceMonth
+        binding.tvGroup.price.tv.text = "股價: $price"
+        // price: high -> low
+        val rStandardList = stock.value?.perStandard?.sortedByDescending { it } ?: emptyList()
+        val rPriceList = riverInfo?.perStockPriceStandard?.sortedByDescending { it } ?: emptyList()
+        val riverTvList = listOf(
+            binding.tvGroup.river1.tv,
+            binding.tvGroup.river2.tv,
+            binding.tvGroup.river3.tv,
+            binding.tvGroup.river4.tv,
+            binding.tvGroup.river5.tv,
+            binding.tvGroup.river6.tv,
+        )
+        if (rStandardList.size == riverTvList.size &&
+            rPriceList.size == riverTvList.size
+        ) {
+            riverTvList.mapIndexed { index, tv ->
+                tv.text = "${rStandardList[index]}倍: ${rPriceList[index]}"
+            }
         }
     }
 
@@ -214,16 +175,94 @@ class LineChartFragment() : Fragment() {
         }
     }
 
+    private fun updateXLabel() {
+        val dateList = stock.value?.riverMapInfo?.map {
+            it?.yearMonth ?: "No date"
+        }?.sortedBy { it }
+            ?: emptyList()
+        if (dateList.isNotEmpty()) {
+            val formatter = CustomXAxisFormatter(dateList)
+            chart.xAxis.valueFormatter = formatter
+        }
+    }
+
+    private fun setLcRange(range: Float) {
+        chart.xAxis.axisMinimum = range
+        chart.notifyDataSetChanged()
+        chart.invalidate()
+    }
+
+    // button
+    private fun changeFocus(index: Int) {
+        btFocus = index
+    }
+
     private fun updateUnderLine() {
         btList.mapIndexed { index, buttonBinding ->
-            val lineColor = if (index == btFocus) {
-                resources.getColor(R.color.black)
+            if (index == btFocus) {
+                buttonBinding.underline.isVisible = true
             } else {
-                // TODO: background color
-                resources.getColor(R.color.purple_700)
+                buttonBinding.underline.isVisible = false
             }
-            buttonBinding.underline.setBackgroundColor(lineColor)
         }
+    }
+
+    // init
+    private fun initPageView() {
+        // button list
+        btList = listOf(
+            binding.buttonGroup.btOne,
+            binding.buttonGroup.btThree,
+            binding.buttonGroup.btFive
+        )
+        // button text & listener
+        btList.mapIndexed { index, buttonBinding ->
+            buttonBinding.tv.text = btStrList[index]
+
+            buttonBinding.root.setOnClickListener {
+                changeFocus(index)
+                updateUnderLine()
+                setLcRange(startRangePointList[index])
+            }
+        }
+    }
+
+    private fun initBtForm() {
+        // date without form
+        binding.tvGroup.date.form.isVisible = false
+        binding.tvGroup.price.form.setBackgroundColor(priceColor)
+
+        val formList = listOf(
+            binding.tvGroup.river1.form,
+            binding.tvGroup.river2.form,
+            binding.tvGroup.river3.form,
+            binding.tvGroup.river4.form,
+            binding.tvGroup.river5.form,
+            binding.tvGroup.river6.form
+        )
+        formList.mapIndexed { index, form ->
+            form.setBackgroundColor(colors[index])
+        }
+    }
+
+    private fun initChart() {
+        chart = binding.lc
+
+        chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chart.xAxis.labelCount = 4
+
+        chart.axisLeft.spaceTop = 20f
+        chart.axisRight.spaceTop = 20f
+
+        chart.legend.isEnabled = false
+
+        chart.description.isEnabled = false
+
+        setChartClickListener()
+
+        updateXLabel()
+
+        setLcRange(startRangePointList[btFocus])
     }
 
     override fun onDestroy() {

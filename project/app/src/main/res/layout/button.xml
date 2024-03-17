@@ -14,5 +14,6 @@
     <TextView
         android:id="@+id/underline"
         android:layout_width="40dp"
-        android:layout_height="2dp" />
+        android:layout_height="2dp"
+        android:background="@color/grey" />
 </LinearLayout>

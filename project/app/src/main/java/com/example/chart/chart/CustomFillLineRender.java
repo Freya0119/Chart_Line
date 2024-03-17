@@ -72,7 +72,7 @@ public class CustomFillLineRender extends LineChartRenderer {
 
         final Entry entry = dataSet.getEntryForIndex(startIndex);
 
-        filled.moveTo(entry.getX(), boundaryEntry.get(0).getY());
+        filled.moveTo(entry.getX(), boundaryEntry.get(startIndex).getY());
         filled.lineTo(entry.getX(), entry.getY() * phaseY);
 
         // create a new path

@@ -10,10 +10,6 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 class CustomFillFormatter : IFillFormatter {
     private var boundaryDataSet: ILineDataSet?
 
-    internal constructor() {
-        this.boundaryDataSet = null
-    }
-
     internal constructor(boundaryDataSet: ILineDataSet?) {
         this.boundaryDataSet = boundaryDataSet
     }
